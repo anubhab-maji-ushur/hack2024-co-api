@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: k8s-api-deployment
+  labels:
+    app: k8s-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: k8s-api
+  template:
+    metadata:
+      labels:
+        app: k8s-api
+    spec:
+      serviceAccountName: full-access-service-account
+      containers:
+      - name: k8s-api
+        imagePullPolicy: Never
+        image: 192.168.49.2:5000/apiserver:latest
+        ports:
+        - containerPort: 3000
+        env:
+        - name: GITHUB_DIR
+          value: "https://api.github.com/repos/navneetlalg-ushur/gitops-poc/contents/jobs?ref=main"
+        - name: REDIS_HOST
+          value: "redis-service"
+
+---
+
+kind: Service
+apiVersion: v1
+metadata:
+  name:  k8s-api
+spec:
+  selector:
+    app:  k8s-api
+  type:  ClusterIP
+  ports:
+  - name:  api
+    port:  3000
+    targetPort:  3000

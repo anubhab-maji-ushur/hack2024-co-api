@@ -1,0 +1,30 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: hello
+  annotations:
+    repo: "https://git.your-big-company.com.br/lms/new-proj"
+    imageregistry: "https://hub.docker.com"
+    maintainer: "Navneet Lal Gupta"
+    email: "navneet@example.com"
+  labels:
+    product: intracity
+    version: stable
+spec:
+  schedule: "* * * * *"
+  successfulJobsHistoryLimit: 10
+  failedJobsHistoryLimit: 10
+  jobTemplate:
+    spec:
+      backoffLimit: 0
+      template:
+        spec:
+          containers:
+          - name: hello
+            image: busybox:1.28
+            imagePullPolicy: IfNotPresent
+            command:
+            - /bin/sh
+            - -c
+            - date; echo sleeping for 1 minutes; sleep 60; echo complete;
+          restartPolicy: Never
